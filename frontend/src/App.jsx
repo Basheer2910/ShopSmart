@@ -34,11 +34,18 @@ function App() {
         setLoading(false);
       });
     } catch (err) {
+      setProductName("");
       setError("Failed to fetch products. Please try again.");
       setLoading(false);
     }
   }
-
+const handleClear=()=>{
+  chrome.storage.sync.set({ 'products': "", 'productName': "" }, function () {
+    setProducts("");
+    setProductName("");
+    setLoading(false);
+  });
+}
   return (
     <>
       {products.length > 0 ? (
@@ -68,6 +75,7 @@ function App() {
               ))}
             </tbody>
           </table>
+          <button onClick={handleClear}>Clear</button>
         </>
       ) : (
         <>
