@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import './App.css';
+// import './App.css';
 
 function App() {
   const [productName, setProductName] = useState("");
@@ -15,7 +15,7 @@ function App() {
         setProducts(result.products);
       }
       if (result?.productName) {
-        setProductName(result.productName);
+        setProductName("");
       }
     });
   }, []);
@@ -32,6 +32,9 @@ function App() {
         setProducts(result.data);
         console.log(result.data);
         setLoading(false);
+        if(result.data.length==0){
+          setError("No Products Found.");
+        }
       });
     } catch (err) {
       setProductName("");
@@ -39,61 +42,74 @@ function App() {
       setLoading(false);
     }
   }
-const handleClear=()=>{
-  chrome.storage.sync.set({ 'products': "", 'productName': "" }, function () {
-    setProducts("");
-    setProductName("");
-    setLoading(false);
-  });
-}
+
+  const handleClear = () => {
+    chrome.storage.sync.set({ 'products': "", 'productName': "" }, function () {
+      setProducts("");
+      setProductName("");
+      setLoading(false);
+    });
+  }
+
   return (
     <>
       {products.length > 0 ? (
         <>
-          <h2>Product Results</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Price</th>
-                <th>Rating</th>
-                <th>Image</th>
-                <th>URL</th>
-                <th>Platform</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product, index) => (
-                <tr key={index}>
-                  <td>{product.Title}</td>
-                  <td>{product.Price}</td>
-                  <td>{product.Rating}</td>
-                  <td><img src={product.Image} alt={product.Title} width="50" /></td>
-                  <td><a href={product.URL} target="_blank" rel="noopener noreferrer">Link</a></td>
-                  <td>{product.Platform}</td>
+          <div className="flex flex-col justify-center items-center w-96">
+            <span className="text-3xl m-3">Product Results</span>
+            <table className="table-auto w-full">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th className="w-1/2">Details</th>
+                  <th>URL</th>
+                  <th>Platform</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <button onClick={handleClear}>Clear</button>
+              </thead>
+              <tbody>
+                {products.map((product, index) => (
+                  <tr key={index} className="border-b">
+                    <td className="p-2"><img src={product.Image} alt={product.Title} width="50" /></td>
+                    <td className="p-2">
+                      <div className="flex flex-col">
+                        <span className="text-amber-950">{product.Title}</span>
+                        <div className="flex flex-row justify-between my-2">
+                          <i className="fa fa-inr" aria-hidden="true"><span>{" "+product.Price+"/-"}</span></i>
+                          <i className="fa fa-star" aria-hidden="true"><span>{product.Rating}</span></i>
+                        </div>
+                        
+                      </div>
+                    </td>
+                    <td className="p-2"><a href={product.URL} target="_blank" rel="noopener noreferrer">Link</a></td>
+                    <td className="p-2">{product.Platform}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button onClick={handleClear} className=" px-3 py-1 m-1 border-solid border-2 border-stone-800 rounded">Clear</button>
+          </div>
         </>
       ) : (
         <>
-          <h2>Search for the product</h2>
-          <form onSubmit={handleSubmit}>
+        <div className="flex flex-col justify-center items-center m-3 w-96">
+          <h2 className="text-3xl m-4">Search for the product</h2>
+          <form onSubmit={handleSubmit} className="m-2">
             <input 
               type="text" 
               value={productName} 
-              onChange={event => setProductName(event.target.value)} 
+              onChange={event => setProductName(event.target.value)}
+              placeholder='Enter the Product...' 
               required 
+              className="w-60 h-6 border-solid border-2 border-stone-800"
             />
-            <button type="submit">Search</button>
+            <button type="submit" className=" px-3 py-1 m-1 border-solid border-2 border-stone-800 rounded">Search</button>
           </form>
+          {loading && <span>Loading...</span>}
+          {error && <span>{error}</span>}
+          </div>
         </>
       )}
 
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
     </>
   )
 }

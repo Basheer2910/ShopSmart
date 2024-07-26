@@ -10,7 +10,7 @@ from .randomIP import RandomIPServer
 def fetchAmazon(product_name, browser):
     try:
         browser.get(f'https://www.amazon.in/s?k={product_name}')
-        time.sleep(5)
+        time.sleep(1)
         page_source = browser.page_source
 
         soup = BeautifulSoup(page_source, 'html.parser')
@@ -59,7 +59,7 @@ def fetchAmazon(product_name, browser):
 def fetchFlipkart(product_name, browser):
     try:
         browser.get(f'https://www.flipkart.com/search?q={product_name}')
-        time.sleep(5)
+        time.sleep(1)
         page_source = browser.page_source
 
         soup = BeautifulSoup(page_source, 'html.parser')
@@ -76,7 +76,7 @@ def fetchFlipkart(product_name, browser):
         product_prices = soup.find_all('div', class_='Nx9bqj _4b5DiR')
         for i, price in enumerate(product_prices):
             if i < len(products):
-                products[i]["Price"] = price.text
+                products[i]["Price"] = price.text[1:]
 
         rating_tags = soup.find_all('div', class_='XQDdHH')
         for i, rating in enumerate(rating_tags):
